@@ -37,7 +37,7 @@ app.post("/register", async (request, response) => {
 
   const hashedPassword = await bcrypt.hash(request.body.password, 10);
 
-  const userCheckingInDatabase = `SELECT * FROM user WHERE username = ${username}`;
+  const userCheckingInDatabase = `SELECT * FROM user WHERE username = '${username}';`;
 
   const dbUser = await database.get(userCheckingInDatabase);
 
@@ -67,14 +67,15 @@ app.post("/register", async (request, response) => {
 
 app.post("/login", async (request, response) => {
   const { username, password } = request.body;
-  const userCheckingInDatabase = `SELECT * FROM user WHERE username = ${username};`;
+  const userCheckingInDatabase = `SELECT * FROM user WHERE username = '${username}';`;
   const dbUser = await database.get(userCheckingInDatabase);
+
   if (dbUser === undefined) {
     response.status(400);
-    response.send("Invalid User");
+    response.send("Invalid user");
   } else {
-    const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
-    if (isPasswordMatched === true) {
+    const passwordComparing = await bcrypt.compare(password, dbUser.password);
+    if (passwordComparing === true) {
       response.send("Login success!");
     } else {
       response.status(400);
@@ -85,7 +86,7 @@ app.post("/login", async (request, response) => {
 
 app.put("/change-password", async (request, response) => {
   const { username, oldPassword, newPassword } = request.body;
-  const gettingDetailsOfUser = `SELECT * FROM user WHERE username = ${username}`;
+  const gettingDetailsOfUser = `SELECT * FROM user WHERE username = '${username}';`;
   const dbUser = await database.get(gettingDetailsOfUser);
   if (dbUser === undefined) {
     response.status(400);
